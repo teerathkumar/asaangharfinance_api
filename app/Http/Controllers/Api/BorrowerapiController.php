@@ -23,37 +23,44 @@ class BorrowerapiController extends Controller {
     }
 
     public function addBorrower(Request $request) {
-        
+
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
-            'gender' => 'required',
-            'dob' => 'required',
             'cnic' => 'required',
-            'mobile' => 'required',
-            'address' => 'required',
+            'gender' => 'required',
+            'mobile' => 'required|regex:/(92)/',
+            'dob' => 'required',
+            'address' => 'required|regex:/^[A-Za-z0-9 ]+$/',
             'amount' => 'required',
-            'loan_tenure' => 'required',
             'markup_rate' => 'required',
+            'loan_tenure' => 'required',
             'loan_frequency' => 'required',
             'disb_date' => 'required',
             'rep_start_date' => 'required',
-            'loan_type_id' => 'required',
+
         ]);
-   
+
         if($validator->fails()){
             return response()->json([
                                         "code" => "04",
                                         "message" => "Validation Error",
                 'data'=>$validator->errors()
-                                            ], 201);            
-            //return $this->sendError('Validation Error.', $validator->errors());       
+                                            ], 201);
+            //return $this->sendError('Validation Error.', $validator->errors());
         }
 
 
 
         $borrower = new LoanBorrower;
         //
-        $existBorrowerId = LoanBorrower::where(['cnic' => $request->cnic])->first("id");
+        $existBorrower = LoanBorrower::where(['cnic' => $request->cnic]);
+        if($existBorrower->count() > 0){
+            return response()->json([
+                "code" => "03",
+                "message" => "Duplicate Entry"
+            ], 201);
+        }
+        $existBorrowerId  = $existBorrower->first("id");
         if ($existBorrowerId) {
             $borrowerId = $existBorrowerId->id;
             $loanStatus = LoanHistory::where(["borrower_id" => $borrowerId, "loan_status_id" => 1])->first("loan_status_id");
@@ -90,7 +97,7 @@ class BorrowerapiController extends Controller {
 
             $GroupName = $request->fname . " " . $request->mname . " " . $request->lname;
             $GroupCode = preg_replace('/\s+/', '_', $GroupName). date("YmdHis");
-            
+
 
             $group = new LoanGroup;
             $group->name = $GroupName;

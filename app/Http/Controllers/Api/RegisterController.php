@@ -20,21 +20,21 @@ public function register(Request $request)
             'password' => 'required',
             'c_password' => 'required|same:password',
         ]);
-   
+
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Validation Error.', $validator->errors());
         }
-   
+
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
         $success['token'] =  $user->createToken('MyApp')->accessToken;
         //$success['token'] =  $user->getToken();
         $success['name'] =  $user->name;
-   
+
         return $this->sendResponse($success, 'User register successfully.');
     }
-   
+
     /**
      * Login api
      *
@@ -42,18 +42,18 @@ public function register(Request $request)
      */
     public function login(Request $request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user = Auth::user(); 
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            $user = Auth::user();
             $tokenData = $user->createToken('MyApp');
-            $success['token'] =  $tokenData-> accessToken; 
-            $success['expires'] =  date("Y-m-d H:i:s", strtotime($tokenData->token-> expires_at)) ; 
+            $success['token'] =  $tokenData-> accessToken;
+            $success['expires'] =  date("Y-m-d H:i:s", strtotime($tokenData->token-> expires_at)) ;
             //$success['token'] =  $user->getToken();
             $success['name'] =  $user->name;
-   
+
             return $this->sendResponse($success, 'User login successfully.');
-        } 
-        else{ 
+        }
+        else{
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
-        } 
-    }    
+        }
+    }
 }

@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Validator;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
- 
+
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [RegisterController::class, 'login']);
 
 Route::middleware('auth:api')->group( function () {
     Route::get('/borrowers', [BorrowerapiController::class,'index']);
-    Route::post("borrower",[BorrowerapiController::class, "addBorrower"]);
+    Route::post("/addborrower",[BorrowerapiController::class, "addBorrower"]);
     //Route::resource('products', ProductController::class);
 });
