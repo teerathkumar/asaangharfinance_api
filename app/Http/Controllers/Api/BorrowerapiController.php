@@ -15,7 +15,9 @@ class BorrowerapiController extends Controller {
     public function index() {
 
 
-        $data = LoanBorrower::all();
+       $data = DB::table('loan_borrowers')
+            ->join('loan_history', 'loan_borrowers.id', '=', 'loan_history.borrower_id')
+            ->get();
         return response()->json([
                     "code" => "01",
                     "message" => $data
